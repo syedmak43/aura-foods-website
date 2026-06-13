@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="blog-page" itemscope itemtype="https://schema.org/Blog">
+    <h1 itemprop="name">Aura Foods Journal</h1>
+    <p>Tips, recipes, wellness guides, and stories from Pakistan's spice heritage.</p>
+    <div class="blog-grid">
+        {% for post in blog_posts %}
+        <a href="/blog/{{ post.slug }}" class="blog-card fade-up" itemscope itemtype="https://schema.org/BlogPosting" itemprop="blogPost">
+            <div class="blog-card-img"><img src="{{ post.image }}" alt="{{ post.title }}" style="width:100%;height:100%;object-fit:cover" loading="lazy" itemprop="image"></div>
+            <div class="blog-card-meta">
+                <span class="blog-card-cat" itemprop="articleSection">{{ post.category }}</span>
+                <span itemprop="timeRequired">{{ post.read_time }} read</span>
+                <span itemprop="datePublished">{{ post.date }}</span>
+            </div>
+            <h3 class="blog-card-title" itemprop="headline">{{ post.title }}</h3>
+            <p style="font-size:.875rem;color:var(--muted);margin-top:.5rem" itemprop="description">{{ post.excerpt }}</p>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

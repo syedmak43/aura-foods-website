@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="checkout-page" itemscope itemtype="https://schema.org/CheckoutPage">
+    <div class="breadcrumbs">
+        <a href="/">Home</a><span>/</span><a href="/cart">Cart</a><span>/</span><span class="current">Checkout</span>
+    </div>
+    <h1 itemprop="name">Checkout</h1>
+
+    <form class="checkout-form" id="checkoutForm" method="post" action="/checkout" onsubmit="return handleCheckout(event)">
+        <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" required placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required placeholder="03XX-XXXXXXX">
+        </div>
+        <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" required placeholder="e.g. Karachi">
+        </div>
+        <div class="form-group">
+            <label for="address">Delivery Address</label>
+            <textarea id="address" name="address" rows="3" required placeholder="Street, house number, landmark" style="padding:.75rem 1rem;border-radius:.75rem;border:1px solid var(--border);font-family:inherit;font-size:.9375rem;resize:vertical"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Payment Method</label>
+            <div class="payment-options">
+                <label class="payment-option active">
+                    <input type="radio" name="payment" value="cod" checked>
+                    <div><strong>Cash on Delivery</strong><br><span style="font-size:.8125rem;color:var(--muted)">Pay when you receive</span></div>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="jazzcash">
+                    <div><strong>JazzCash</strong><br><span style="font-size:.8125rem;color:var(--muted)">Pay via JazzCash account</span></div>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="easypaisa">
+                    <div><strong>Easypaisa</strong><br><span style="font-size:.8125rem;color:var(--muted)">Pay via Easypaisa account</span></div>
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="btn-checkout" style="margin-top:.5rem">Place Order</button>
+    </form>
+</div>
+
+<script>
+function handleCheckout(e) {
+    e.preventDefault();
+    const cart = JSON.parse(localStorage.getItem('auraCart') || '[]');
+    if (cart.length === 0) {
+        showToast('Your cart is empty!');
+        return false;
+    }
+    localStorage.setItem('auraCheckoutCart', JSON.stringify(cart));
+    localStorage.removeItem('auraCart');
+    window.location.href = '/order-confirmation';
+    return false;
+}
+document.querySelectorAll('.payment-option').forEach(opt => {
+    opt.addEventListener('click', function() {
+        document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
+        this.classList.add('active');
+        this.querySelector('input[type="radio"]').checked = true;
+    });
+});
+</script>
+{% endblock %}

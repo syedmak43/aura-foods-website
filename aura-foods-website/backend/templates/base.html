@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ meta.title }}</title>
+    <meta name="description" content="{{ meta.description }}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ meta.url }}">
+
+    <meta property="og:title" content="{{ meta.title }}">
+    <meta property="og:description" content="{{ meta.description }}">
+    <meta property="og:url" content="{{ meta.url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ meta.image | default('https://aurafoods.pk/static/images/hero-spices.jpg') }}">
+    <meta property="og:site_name" content="Aura Foods Pakistan">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ meta.title }}">
+    <meta name="twitter:description" content="{{ meta.description }}">
+    <meta name="twitter:image" content="{{ meta.image | default('https://aurafoods.pk/static/images/hero-spices.jpg') }}">
+
+    {% if schema_org %}
+    <script type="application/ld+json">{{ schema_org | safe }}</script>
+    {% endif %}
+
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/critical.css">
+</head>
+<body>
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="/" class="nav-logo" aria-label="Aura Foods Home">
+                <span class="logo-icon">✦</span>
+                <span class="logo-text">AURA <small>FOODS</small></span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/shop">Shop</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li>
+                    <a href="/cart" class="cart-link" aria-label="Shopping cart">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="footer-logo">✦ AURA FOODS</span>
+                    <p>Pure & Premium Organic Spices of Pakistan. From Sindh soil to your spice rack.</p>
+                    <div class="footer-social">
+                        <a href="https://wa.me/923001234567" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
+                        <a href="https://instagram.com/aurafoods" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
+                        <a href="https://facebook.com/aurafoods" target="_blank" rel="noopener" aria-label="Facebook">FB</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <ul>
+                        {% for cat in ["Red Chili Powder", "Turmeric Powder", "Coriander Powder", "Garam Masala", "BBQ Range", "Premium Blends"] %}
+                        <li><a href="/shop?category={{ cat.lower().replace(' ', '-') }}">{{ cat }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/shop">Wholesale</a></li>
+                        <li><a href="/shop">Track Order</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul class="footer-contact">
+                        <li>📞 +92 300 1234567</li>
+                        <li>✉️ hello@aurafoods.pk</li>
+                        <li>📍 Karachi, Pakistan</li>
+                    </ul>
+                    <a href="https://wa.me/923001234567" target="_blank" rel="noopener" class="btn-whatsapp">Order on WhatsApp</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Aura Foods. All rights reserved.</p>
+                <p>100% Organic | No Preservatives | Pakistan-wide Delivery</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

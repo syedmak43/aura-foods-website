@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard — Aura Foods</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0a0a0a;--gold:#c9a84c;--cream:#faf7f2;--green:#4a6741;--red:#c0392b;--muted:#999}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:Inter,sans-serif;background:#f0eeeb;color:var(--ink);font-size:14px;line-height:1.5}
+        /* Sidebar */
+        .admin-wrap{display:flex;min-height:100vh}
+        .sidebar{width:240px;background:var(--ink);color:rgba(250,247,242,0.85);flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+        .sidebar-head{padding:1.25rem 1.25rem .75rem;border-bottom:1px solid rgba(250,247,242,0.08)}
+        .sidebar-head h2{font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem;letter-spacing:-.01em}
+        .sidebar-head small{font-size:.65rem;opacity:.5;display:block;margin-top:2px}
+        .sidebar-nav{padding:.5rem 0;flex:1}
+        .sidebar-nav a{display:flex;align-items:center;gap:.625rem;padding:.55rem 1.25rem;color:rgba(250,247,242,0.7);text-decoration:none;font-size:.8125rem;transition:all .15s;border-left:3px solid transparent}
+        .sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(201,168,76,0.08);color:var(--gold);border-left-color:var(--gold)}
+        .sidebar-nav a .ico{width:18px;text-align:center;font-size:1rem}
+        .sidebar-foot{padding:.75rem 1.25rem;border-top:1px solid rgba(250,247,242,0.08)}
+        .sidebar-foot a{color:rgba(192,57,43,0.7);font-size:.75rem;text-decoration:none}
+        .sidebar-foot a:hover{color:var(--red)}
+        /* Main */
+        .main{flex:1;min-width:0;padding:1.5rem 2rem;max-width:calc(100vw - 240px)}
+        .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(10,10,10,0.06)}
+        .topbar h1{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700}
+        .topbar-actions{display:flex;gap:.5rem}
+        .btn-site{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:8px;font-size:.75rem;font-weight:600;text-decoration:none;background:var(--ink);color:#fff;transition:all .15s}
+        .btn-site:hover{opacity:.85}
+        .btn-logout{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:8px;font-size:.75rem;font-weight:600;text-decoration:none;background:rgba(192,57,43,0.08);color:var(--red);transition:all .15s}
+        .btn-logout:hover{background:rgba(192,57,43,0.15)}
+        /* Stats bar */
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-bottom:1.5rem}
+        .stat-card{background:#fff;border-radius:10px;padding:1rem;border:1px solid rgba(10,10,10,0.05);text-align:center}
+        .stat-card .num{font-size:1.5rem;font-weight:700;font-family:'Playfair Display',serif}
+        .stat-card .label{font-size:.6875rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+        /* Card */
+        .card{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;border:1px solid rgba(10,10,10,0.05)}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(10,10,10,0.05)}
+        .card-header h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--ink)}
+        .card-header .count{font-size:.75rem;color:var(--muted);background:rgba(10,10,10,0.04);padding:.15rem .55rem;border-radius:999px}
+        /* Table */
+        .table-wrap{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;font-size:.8125rem}
+        th{text-align:left;padding:.6rem .5rem;color:var(--muted);font-weight:600;text-transform:uppercase;font-size:.65rem;letter-spacing:.06em;border-bottom:2px solid rgba(10,10,10,0.05);white-space:nowrap}
+        td{padding:.55rem .5rem;border-bottom:1px solid rgba(10,10,10,0.04);vertical-align:middle}
+        tr:hover td{background:rgba(201,168,76,0.02)}
+        .td-img{width:44px;height:44px;border-radius:6px;object-fit:cover;background:#f5f3ef;display:block}
+        .badge{display:inline-block;padding:.15rem .5rem;border-radius:999px;font-size:.625rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+        .badge-gold{background:var(--gold);color:var(--ink)}
+        .badge-green{background:var(--green);color:#fff}
+        .badge-red{background:var(--red);color:#fff}
+        /* Action buttons */
+        .actions{display:flex;gap:3px;flex-wrap:nowrap}
+        .a-btn{display:inline-flex;align-items:center;gap:4px;padding:.3rem .6rem;border-radius:5px;font-size:.6875rem;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:all .12s;white-space:nowrap;background:transparent;font-family:inherit}
+        .a-btn:hover{transform:translateY(-1px)}
+        .a-btn-edit{color:var(--gold);background:rgba(201,168,76,0.08)}.a-btn-edit:hover{background:rgba(201,168,76,0.18)}
+        .a-btn-del{color:var(--red);background:rgba(192,57,43,0.06)}.a-btn-del:hover{background:rgba(192,57,43,0.15)}
+        .a-btn-img{color:var(--green);background:rgba(74,103,65,0.08)}.a-btn-img:hover{background:rgba(74,103,65,0.18)}
+        /* Forms */
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+        .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+        .form-full{grid-column:1/-1}
+        .form-group{margin-bottom:.25rem}
+        .form-group label{display:block;font-size:.6875rem;font-weight:600;color:var(--muted);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.03em}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:.55rem .7rem;border:1px solid rgba(10,10,10,0.1);border-radius:6px;font-size:.8125rem;font-family:inherit;background:#fafafa;transition:border .15s}
+        .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);background:#fff}
+        .form-group textarea{resize:vertical;min-height:56px}
+        .form-group .inline-check{display:flex;align-items:center;gap:.5rem;margin-top:.5rem}
+        .form-group .inline-check label{display:inline;text-transform:none;color:var(--ink);font-weight:500}
+        .form-group .inline-check input{width:auto}
+        .btn-primary{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.25rem;border-radius:8px;font-size:.8125rem;font-weight:600;border:none;cursor:pointer;transition:all .15s;font-family:inherit}
+        .btn-primary{background:var(--ink);color:#fff}.btn-primary:hover{opacity:.85}
+        .btn-gold{background:var(--gold);color:var(--ink)}.btn-gold:hover{opacity:.9}
+        .btn-sm{padding:.35rem .75rem;font-size:.75rem;border-radius:6px}
+        /* Modal */
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;backdrop-filter:blur(4px);justify-content:center;align-items:flex-start;padding:2rem;overflow-y:auto}
+        .modal-overlay.active{display:flex}
+        .modal{background:#fff;border-radius:16px;width:100%;max-width:700px;padding:2rem;box-shadow:0 20px 60px rgba(0,0,0,0.2);margin:auto;animation:modalIn .2s ease}
+        .modal-sm{max-width:480px}
+        @keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid rgba(10,10,10,0.06)}
+        .modal-head h2{font-size:1.1rem;font-weight:700}
+        .modal-close{width:32px;height:32px;border-radius:50%;border:none;background:rgba(10,10,10,0.04);cursor:pointer;font-size:1.25rem;display:grid;place-items:center;transition:all .15s}
+        .modal-close:hover{background:rgba(10,10,10,0.1)}
+        .modal-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(10,10,10,0.06)}
+        /* Tabs */
+        .section{display:none}
+        .section.active{display:block}
+        /* File upload */
+        .file-drop{border:2px dashed rgba(10,10,10,0.1);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .15s}
+        .file-drop:hover{border-color:var(--gold);background:rgba(201,168,76,0.03)}
+        .file-drop input{display:none}
+        .file-drop .hint{font-size:.75rem;color:var(--muted);margin-top:.25rem}
+        /* Responsive */
+        @media(max-width:768px){.sidebar{width:60px}.sidebar-head h2{font-size:.7rem}.sidebar-head small,.sidebar-nav a span{display:none}.sidebar-nav a{padding:.55rem;justify-content:center}.main{padding:1rem;max-width:100vw}.form-grid,.form-grid-3{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+        /* Scrollbar */
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(10,10,10,0.1);border-radius:999px}
+        .empty-state{text-align:center;padding:2rem;color:var(--muted);font-size:.875rem}
+        hr{margin:1rem 0;border:none;border-top:1px solid rgba(10,10,10,0.05)}
+        .tag{display:inline-block;padding:.2rem .5rem;border-radius:4px;font-size:.625rem;font-weight:600;background:rgba(10,10,10,0.04)}
+        .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--ink);color:#fff;padding:.75rem 1.25rem;border-radius:10px;font-size:.8125rem;box-shadow:0 8px 30px rgba(0,0,0,0.15);z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}
+        .img-preview{width:44px;height:44px;border-radius:6px;object-fit:cover;background:#f5f3ef}
+        .img-preview-lg{width:100px;height:100px;border-radius:8px;object-fit:cover;background:#f5f3ef;border:1px solid rgba(10,10,10,0.06)}
+    </style>
+</head>
+<body>
+<div class="admin-wrap">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-head">
+            <h2>✦ Aura</h2>
+            <small>Content Management</small>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active" data-section="dashboard"><span class="ico">📊</span><span>Dashboard</span></a>
+            <a href="#" data-section="products"><span class="ico">📦</span><span>Products</span></a>
+            <a href="#" data-section="categories"><span class="ico">🏷️</span><span>Categories</span></a>
+            <a href="#" data-section="testimonials"><span class="ico">💬</span><span>Testimonials</span></a>
+            <a href="#" data-section="bundles"><span class="ico">🎁</span><span>Bundles</span></a>
+            <a href="#" data-section="blog"><span class="ico">📝</span><span>Blog Posts</span></a>
+            <a href="#" data-section="why"><span class="ico">✅</span><span>Why Items</span></a>
+            <a href="#" data-section="settings"><span class="ico">⚙️</span><span>Settings</span></a>
+            <a href="#" data-section="images"><span class="ico">🖼️</span><span>Media</span></a>
+        </nav>
+        <div class="sidebar-foot"><a href="/admin/logout">🚪 Logout</a></div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <h1>Dashboard</h1>
+            <div class="topbar-actions">
+                <a href="/" target="_blank" class="btn-site">View Site ↗</a>
+                <a href="/admin/logout" class="btn-logout">Logout</a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card"><div class="num">{{ products|length }}</div><div class="label">Products</div></div>
+            <div class="stat-card"><div class="num">{{ categories|length }}</div><div class="label">Categories</div></div>
+            <div class="stat-card"><div class="num">{{ testimonials|length }}</div><div class="label">Testimonials</div></div>
+            <div class="stat-card"><div class="num">{{ bundles|length }}</div><div class="label">Bundles</div></div>
+            <div class="stat-card"><div class="num">{{ blog_posts|length }}</div><div class="label">Blog Posts</div></div>
+        </div>
+
+        <!-- ===================== SECTION: DASHBOARD ===================== -->
+        <div id="sec-dashboard" class="section active">
+            <div class="card">
+                <div class="card-header"><h3>Quick Actions</h3></div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem">
+                    <button class="btn-primary" onclick="switchSection('products')">➕ Add Product</button>
+                    <button class="btn-primary btn-gold" onclick="switchSection('blog')">📝 New Blog Post</button>
+                    <button class="btn-primary" onclick="switchSection('images')">🖼️ Upload Image</button>
+                    <button class="btn-primary" onclick="switchSection('settings')">⚙️ Edit Settings</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3>Recent Products</h3></div>
+                {% if products %}
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Product</th><th>Price</th><th>Category</th><th>Status</th></tr></thead>
+                    <tbody>{% for p in products[:5] %}<tr>
+                        <td><div style="display:flex;align-items:center;gap:.5rem"><img src="{{ p.image or '' }}" class="img-preview" alt=""><strong>{{ p.name }}</strong></div></td>
+                        <td>Rs.{{ p.price }}</td><td>{{ p.category_name or '—' }}</td>
+                        <td>{% if p.best_seller %}<span class="badge badge-gold">Bestseller</span>{% endif %}{% if p.new_arrival %}<span class="badge badge-green">New</span>{% endif %}</td>
+                    </tr>{% endfor %}</tbody></table></div>
+                {% else %}<div class="empty-state">No products yet. <a href="#" onclick="switchSection('products')">Add your first product</a></div>{% endif %}
+            </div>
+        </div>
+
+        <!-- ===================== SECTION: PRODUCTS ===================== -->
+        <div id="sec-products" class="section">
+            <div class="card">
+                <div class="card-header"><h3>All Products</h3><span class="count">{{ products|length }} total</span></div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th></th><th>Name</th><th>Price</th><th>Weight</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td><img src="{{ p.image if p.image else '/static/images/hero-spices.jpg' }}" class="td-img" alt=""></td>
+                        <td><strong>{{ p.name }}</strong><br><span style="font-size:.6875rem;color:var(--muted)">{{ p.tagline }}</span></td>
+                        <td>Rs.{{ p.price }}{% if p.old_price and p.old_price > p.price %}<br><span style="font-size:.6875rem;color:var(--muted);text-decoration:line-through">Rs.{{ p.old_price }}</span>{% endif %}</td>
+                        <td>{{ p.weight }}</td>
+                        <td>{{ p.category_name or '—' }}</td>
+                        <td>{% if p.best_seller %}<span class="badge badge-gold">Bestseller</span> {% endif %}{% if p.new_arrival %}<span class="badge badge-green">New</span>{% endif %}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="a-btn a-btn-edit" onclick="editProductModal({{ p.id }})">✏️ Edit</button>
+                                <button class="a-btn a-btn-img" onclick="uploadProductImg({{ p.id }})">🖼️ Img</button>
+                                <form class="inline-form" method="post" action="/admin/product/delete/{{ p.id }}" onsubmit="return confirm('Delete {{ p.name|e }}?')"><button class="a-btn a-btn-del">🗑️</button></form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody></table>
+                </div>
+                <hr>
+                <div class="card-header"><h3>Add New Product</h3></div>
+                <form method="post" action="/admin/product/add">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Product Name *</label><input name="name" required></div>
+                        <div class="form-group"><label>Tagline</label><input name="tagline"></div>
+                        <div class="form-group"><label>Price (Rs.) *</label><input name="price" type="number" step="1" required></div>
+                        <div class="form-group"><label>Old Price (Rs.)</label><input name="old_price" type="number" step="1" value="0"></div>
+                        <div class="form-group"><label>Weight</label><input name="weight" value="200g"></div>
+                        <div class="form-group"><label>Category</label>
+                            <select name="category_id">{% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select></div>
+                        <div class="form-group form-full"><label>Description</label><textarea name="description" rows="2"></textarea></div>
+                        <div class="form-group"><label>Ingredients</label><textarea name="ingredients" rows="1"></textarea></div>
+                        <div class="form-group"><label>Usage</label><textarea name="usage" rows="1"></textarea></div>
+                    </div>
+                    <div style="display:flex;gap:1rem;margin-top:.5rem">
+                        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8125rem;cursor:pointer"><input name="best_seller" type="checkbox" value="1"> Best Seller</label>
+                        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8125rem;cursor:pointer"><input name="new_arrival" type="checkbox" value="1"> New Arrival</label>
+                    </div>
+                    <button class="btn-primary" style="margin-top:.75rem">Add Product</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===================== SECTION: CATEGORIES ===================== -->
+        <div id="sec-categories" class="section">
+            <div class="card">
+                <div class="card-header"><h3>Categories</h3><span class="count">{{ categories|length }} total</span></div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Name</th><th>Products</th><th>Actions</th></tr></thead>
+                    <tbody>{% for c in categories %}<tr>
+                        <td><strong>{{ c.name }}</strong></td><td>{{ c.count or 0 }}</td>
+                        <td><div class="actions">
+                            <button class="a-btn a-btn-edit" onclick="editCatModal({{ c.id }},'{{ c.name|e }}')">✏️ Edit</button>
+                            <form class="inline-form" method="post" action="/admin/category/delete/{{ c.id }}" onsubmit="return confirm('Delete {{ c.name|e }}?')"><button class="a-btn a-btn-del">🗑️</button></form>
+                        </div></td>
+                    </tr>{% endfor %}</tbody></table>
+                </div>
+                <hr>
+                <div class="card-header"><h3>Add Category</h3></div>
+                <form method="post" action="/admin/category/add"><div style="display:flex;gap:.5rem;max-width:400px"><input name="name" placeholder="Category name" required style="flex:1;padding:.55rem .7rem;border:1px solid rgba(10,10,10,0.1);border-radius:6px;font-size:.8125rem;font-family:inherit"><button class="btn-primary btn-sm">Add</button></div></form>
+            </div>
+        </div>
+
+        <!-- ===================== SECTION: TESTIMONIALS ===================== -->
+        <div id="sec-testimonials" class="section">
+            <div class="card">
+                <div class="card-header"><h3>Testimonials</h3><span class="count">{{ testimonials|length }} total</span></div>
+                {% if testimonials %}
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Name</th><th>City</th><th>Review</th><th>Actions</th></tr></thead>
+                    <tbody>{% for t in testimonials %}<tr>
+                        <td><strong>{{ t.name }}</strong></td><td>{{ t.city }}</td>
+                        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.text }}</td>
+                        <td><form class="inline-form" method="post" action="/admin/testimonial/delete/{{ t.id }}" onsubmit="return confirm('Delete?')"><button class="a-btn a-btn-del">🗑️ Delete</button></form></td>
+                    </tr>{% endfor %}</tbody></table></div>
+                {% else %}<div class="empty-state">No testimonials yet.</div>{% endif %}
+                <hr>
+                <div class="card-header"><h3>Add Testimonial</h3></div>
+                <form method="post" action="/admin/testimonial/add">
+                    <div class="form-grid"><div class="form-group"><label>Name *</label><input name="name" required></div><div class="form-group"><label>City</label><input name="city"></div></div>
+                    <div class="form-group"><label>Review Text *</label><textarea name="text" rows="2" required></textarea></div>
+                    <button class="btn-primary btn-sm">Add Testimonial</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===================== SECTION: BUNDLES ===================== -->
+        <div id="sec-bundles" class="section">
+            <div class="card">
+                <div class="card-header"><h3>Bundles / Combos</h3><span class="count">{{ bundles|length }} total</span></div>
+                {% if bundles %}
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Name</th><th>Items</th><th>Price</th><th>Old Price</th><th>Save</th><th>Actions</th></tr></thead>
+                    <tbody>{% for b in bundles %}<tr>
+                        <td><strong>{{ b.name }}</strong></td><td>{{ b.items }}</td><td>Rs.{{ b.price }}</td><td>Rs.{{ b.old_price }}</td><td>🔥 {{ b.save_percent }}%</td>
+                        <td><form class="inline-form" method="post" action="/admin/bundle/delete/{{ b.id }}" onsubmit="return confirm('Delete {{ b.name|e }}?')"><button class="a-btn a-btn-del">🗑️</button></form></td>
+                    </tr>{% endfor %}</tbody></table></div>
+                {% else %}<div class="empty-state">No bundles yet.</div>{% endif %}
+                <hr>
+                <div class="card-header"><h3>Add Bundle</h3></div>
+                <form method="post" action="/admin/bundle/add">
+                    <div class="form-grid-3">
+                        <div class="form-group"><label>Bundle Name *</label><input name="name" required></div>
+                        <div class="form-group"><label>Price (Rs.) *</label><input name="price" type="number" step="1" required></div>
+                        <div class="form-group"><label>Old Price (Rs.)</label><input name="old_price" type="number" step="1"></div>
+                    </div>
+                    <div class="form-group"><label>Items (comma separated)</label><input name="items"></div>
+                    <button class="btn-primary btn-sm">Add Bundle</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===================== SECTION: BLOG ===================== -->
+        <div id="sec-blog" class="section">
+            <div class="card">
+                <div class="card-header"><h3>Blog Posts</h3><span class="count">{{ blog_posts|length }} total</span></div>
+                {% if blog_posts %}
+                <div class="table-wrap"><table>
+                    <thead><tr><th></th><th>Title</th><th>Category</th><th>Date</th><th>Actions</th></tr></thead>
+                    <tbody>{% for b in blog_posts %}<tr>
+                        <td><img src="{{ b.image or '/static/images/placeholder.jpg' }}" class="td-img" alt=""></td>
+                        <td><strong>{{ b.title }}</strong></td><td><span class="tag">{{ b.category }}</span></td><td>{{ b.date }}</td>
+                        <td><div class="actions">
+                            <button class="a-btn a-btn-img" onclick="uploadBlogImg({{ b.id }})">🖼️ Img</button>
+                            <form class="inline-form" method="post" action="/admin/blog/delete/{{ b.id }}" onsubmit="return confirm('Delete {{ b.title|e }}?')"><button class="a-btn a-btn-del">🗑️</button></form>
+                        </div></td>
+                    </tr>{% endfor %}</tbody></table></div>
+                {% else %}<div class="empty-state">No blog posts yet.</div>{% endif %}
+                <hr>
+                <div class="card-header"><h3>New Blog Post</h3></div>
+                <form method="post" action="/admin/blog/add">
+                    <div class="form-grid-3">
+                        <div class="form-group"><label>Title *</label><input name="title" required></div>
+                        <div class="form-group"><label>Category</label><input name="category" value="General"></div>
+                        <div class="form-group"><label>Read Time</label><input name="read_time" value="5 min"></div>
+                    </div>
+                    <div class="form-group"><label>Excerpt</label><textarea name="excerpt" rows="2"></textarea></div>
+                    <div class="form-group"><label>Content (HTML supported)</label><textarea name="content" rows="5"></textarea></div>
+                    <button class="btn-primary btn-sm">Publish Post</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===================== SECTION: WHY ITEMS ===================== -->
+        <div id="sec-why" class="section">
+            <div class="card">
+                <div class="card-header"><h3>Why Aura Foods — Feature Blocks</h3></div>
+                {% if why_items %}
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Icon</th><th>Title</th><th>Description</th><th>Actions</th></tr></thead>
+                    <tbody>{% for w in why_items %}<tr>
+                        <td>🟢</td><td><strong>{{ w.title }}</strong></td><td style="max-width:350px">{{ w.description }}</td>
+                        <td><button class="a-btn a-btn-edit" onclick="editWhyModal({{ w.id }},'{{ w.title|e }}','{{ w.description|e }}')">✏️ Edit</button></td>
+                    </tr>{% endfor %}</tbody></table></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ===================== SECTION: SETTINGS ===================== -->
+        <div id="sec-settings" class="section">
+            <div class="card">
+                <div class="card-header"><h3>Site Settings</h3></div>
+                <form method="post" action="/admin/settings">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Site Name</label><input name="setting_site_name" value="{{ settings.site_name }}"></div>
+                        <div class="form-group"><label>Tagline</label><input name="setting_site_tagline" value="{{ settings.site_tagline }}"></div>
+                        <div class="form-group form-full"><label>Hero Title (HTML allowed)</label><input name="setting_hero_title" value="{{ settings.hero_title or 'Pure &amp; Premium <em>Organic Spices</em>' }}"></div>
+                        <div class="form-group form-full"><label>Hero Subtitle</label><textarea name="setting_hero_subtitle" rows="2">{{ settings.hero_subtitle }}</textarea></div>
+                        <div class="form-group"><label>Hero Badge</label><input name="setting_hero_badge" value="{{ settings.hero_badge or 'Hand-sourced · Stone-ground · Freshly packed' }}"></div>
+                        <div class="form-group"><label>Story Location</label><input name="setting_story_location" value="{{ settings.story_location }}"></div>
+                        <div class="form-group"><label>About Title</label><input name="setting_about_title" value="{{ settings.about_title or 'From Sindh Soil to Your Spice Rack' }}"></div>
+                        <div class="form-group form-full"><label>About Content</label><textarea name="setting_about_content" rows="2">{{ settings.about_content }}</textarea></div>
+                        <div class="form-group"><label>Phone</label><input name="setting_phone" value="{{ settings.phone }}"></div>
+                        <div class="form-group"><label>Email</label><input name="setting_email" value="{{ settings.email }}"></div>
+                        <div class="form-group"><label>Address</label><input name="setting_address" value="{{ settings.address }}"></div>
+                        <div class="form-group"><label>WhatsApp Number (without +)</label><input name="setting_whatsapp" value="{{ settings.whatsapp }}"></div>
+                    </div>
+                    <button class="btn-primary" style="margin-top:1rem">Save All Settings</button>
+                </form>
+
+                <hr>
+                <div class="card-header"><h3>Change Password</h3></div>
+                <form method="post" action="/admin/change-password" style="max-width:400px">
+                    <div class="form-group"><label>Current Password</label><input name="current" type="password" required></div>
+                    <div class="form-group"><label>New Password</label><input name="newpass" type="password" required></div>
+                    <button class="btn-primary btn-sm" style="margin-top:.25rem">Update Password</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===================== SECTION: IMAGES ===================== -->
+        <div id="sec-images" class="section">
+            <div class="card">
+                <div class="card-header"><h3>Upload Media</h3></div>
+                <div class="form-grid-3">
+                    <div>
+                        <div class="card-header"><h4>Hero Image</h4></div>
+                        <form method="post" action="/admin/hero-image" enctype="multipart/form-data">
+                            <div class="file-drop" onclick="this.querySelector('input').click()">
+                                <div style="font-size:1.5rem;margin-bottom:.25rem">🖼️</div>
+                                <div style="font-size:.8125rem;font-weight:600">Click to upload</div>
+                                <div class="hint">Recommended: 1920x1080</div>
+                                <input type="file" name="file" accept="image/*" onchange="this.form.submit()">
+                            </div>
+                        </form>
+                    </div>
+                    <div>
+                        <div class="card-header"><h4>Story Image</h4></div>
+                        <form method="post" action="/admin/story-image" enctype="multipart/form-data">
+                            <div class="file-drop" onclick="this.querySelector('input').click()">
+                                <div style="font-size:1.5rem;margin-bottom:.25rem">📸</div>
+                                <div style="font-size:.8125rem;font-weight:600">Click to upload</div>
+                                <div class="hint">Recommended: 800x1000</div>
+                                <input type="file" name="file" accept="image/*" onchange="this.form.submit()">
+                            </div>
+                        </form>
+                    </div>
+                    <div>
+                        <div class="card-header"><h4>Generic Upload</h4></div>
+                        <form method="post" action="/admin/upload" enctype="multipart/form-data">
+                            <div class="file-drop" onclick="this.querySelector('input').click()">
+                                <div style="font-size:1.5rem;margin-bottom:.25rem">📁</div>
+                                <div style="font-size:.8125rem;font-weight:600">Click to upload</div>
+                                <div class="hint">Any image file</div>
+                                <input type="file" name="file" accept="image/*" onchange="this.form.submit()">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /main -->
+</div><!-- /admin-wrap -->
+
+<!-- ===================== MODAL: Edit Product ===================== -->
+<div class="modal-overlay" id="editProductModal">
+    <div class="modal">
+        <div class="modal-head"><h2>Edit Product</h2><button class="modal-close" onclick="closeModal('editProductModal')">×</button></div>
+        <form method="post" id="editProductForm">
+            <div class="form-grid">
+                <div class="form-group"><label>Product Name</label><input name="name" id="ep_name" required></div>
+                <div class="form-group"><label>Tagline</label><input name="tagline" id="ep_tagline"></div>
+                <div class="form-group"><label>Price (Rs.)</label><input name="price" type="number" step="1" id="ep_price" required></div>
+                <div class="form-group"><label>Old Price</label><input name="old_price" type="number" step="1" id="ep_old_price" value="0"></div>
+                <div class="form-group"><label>Weight</label><input name="weight" id="ep_weight"></div>
+                <div class="form-group"><label>Category</label><select name="category_id" id="ep_category">{% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select></div>
+                <div class="form-group form-full"><label>Description</label><textarea name="description" id="ep_desc" rows="2"></textarea></div>
+                <div class="form-group"><label>Ingredients</label><textarea name="ingredients" id="ep_ing" rows="1"></textarea></div>
+                <div class="form-group"><label>Usage</label><textarea name="usage" id="ep_usage" rows="1"></textarea></div>
+            </div>
+            <div style="display:flex;gap:1rem;margin-top:.5rem">
+                <label style="display:flex;align-items:center;gap:.35rem;font-size:.8125rem;cursor:pointer"><input type="checkbox" id="ep_bs" name="best_seller" value="1"> Best Seller</label>
+                <label style="display:flex;align-items:center;gap:.35rem;font-size:.8125rem;cursor:pointer"><input type="checkbox" id="ep_na" name="new_arrival" value="1"> New Arrival</label>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-primary btn-sm" style="background:rgba(10,10,10,0.06);color:var(--ink)" onclick="closeModal('editProductModal')">Cancel</button>
+                <button type="submit" class="btn-primary btn-sm btn-gold">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===================== MODAL: Edit Category ===================== -->
+<div class="modal-overlay" id="editCatModal">
+    <div class="modal modal-sm">
+        <div class="modal-head"><h2>Edit Category</h2><button class="modal-close" onclick="closeModal('editCatModal')">×</button></div>
+        <form method="post" id="editCatForm">
+            <div class="form-group"><label>Category Name</label><input name="name" id="ec_name" required></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-primary btn-sm" style="background:rgba(10,10,10,0.06);color:var(--ink)" onclick="closeModal('editCatModal')">Cancel</button>
+                <button type="submit" class="btn-primary btn-sm btn-gold">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===================== MODAL: Edit Why Item ===================== -->
+<div class="modal-overlay" id="editWhyModal">
+    <div class="modal modal-sm">
+        <div class="modal-head"><h2>Edit Feature Block</h2><button class="modal-close" onclick="closeModal('editWhyModal')">×</button></div>
+        <form method="post" id="editWhyForm">
+            <div class="form-group"><label>Title</label><input name="title" id="ew_title" required></div>
+            <div class="form-group"><label>Description</label><textarea name="description" id="ew_desc" rows="3"></textarea></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-primary btn-sm" style="background:rgba(10,10,10,0.06);color:var(--ink)" onclick="closeModal('editWhyModal')">Cancel</button>
+                <button type="submit" class="btn-primary btn-sm btn-gold">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===================== HIDDEN FORM: Upload Product Image ===================== -->
+<form method="post" enctype="multipart/form-data" id="uploadProductImgForm" style="display:none"><input type="file" name="file" accept="image/*" id="uploadProductImgInput" onchange="this.form.submit()"></form>
+<form method="post" enctype="multipart/form-data" id="uploadBlogImgForm" style="display:none"><input type="file" name="file" accept="image/*" id="uploadBlogImgInput" onchange="this.form.submit()"></form>
+
+<div class="toast" id="toast"></div>
+
+<style>
+    .inline-form{display:inline}
+    hr{border:none;border-top:1px solid rgba(10,10,10,0.05);margin:1rem 0}
+</style>
+
+<script>
+// === SECTION SWITCHING ===
+function switchSection(name) {
+    document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav a').forEach(el => el.classList.remove('active'));
+    document.getElementById('sec-' + name).classList.add('active');
+    document.querySelector(`.sidebar-nav a[data-section="${name}"]`).classList.add('active');
+    window.location.hash = name;
+}
+
+document.querySelectorAll('.sidebar-nav a').forEach(a => {
+    a.addEventListener('click', function(e) {
+        e.preventDefault();
+        switchSection(this.dataset.section);
+    });
+});
+
+if (window.location.hash) {
+    const name = window.location.hash.replace('#','');
+    if (document.getElementById('sec-' + name)) switchSection(name);
+}
+
+// === MODALS ===
+function openModal(id){document.getElementById(id).classList.add('active');document.body.style.overflow='hidden'}
+function closeModal(id){document.getElementById(id).classList.remove('active');document.body.style.overflow=''}
+document.querySelectorAll('.modal-overlay').forEach(el => {el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');document.body.style.overflow=''})});
+
+// === EDIT PRODUCT ===
+function editProductModal(id) {
+    fetch('/api/product/' + id).then(r=>r.json()).then(p=>{
+        document.getElementById('editProductForm').action = '/admin/product/edit/' + id;
+        document.getElementById('ep_name').value = p.name;
+        document.getElementById('ep_tagline').value = p.tagline || '';
+        document.getElementById('ep_price').value = p.price;
+        document.getElementById('ep_old_price').value = p.old_price || 0;
+        document.getElementById('ep_weight').value = p.weight || '200g';
+        document.getElementById('ep_category').value = p.category_id;
+        document.getElementById('ep_desc').value = p.description || '';
+        document.getElementById('ep_ing').value = p.ingredients || '';
+        document.getElementById('ep_usage').value = p.usage || '';
+        document.getElementById('ep_bs').checked = p.best_seller == 1;
+        document.getElementById('ep_na').checked = p.new_arrival == 1;
+        openModal('editProductModal');
+    }).catch(()=>alert('Error loading product'));
+}
+
+function uploadProductImg(id) {
+    document.getElementById('uploadProductImgForm').action = '/admin/product/image/' + id;
+    document.getElementById('uploadProductImgInput').click();
+}
+
+function uploadBlogImg(id) {
+    document.getElementById('uploadBlogImgForm').action = '/admin/blog/image/' + id;
+    document.getElementById('uploadBlogImgInput').click();
+}
+
+function editCatModal(id,name) {
+    document.getElementById('editCatForm').action = '/admin/category/edit/' + id;
+    document.getElementById('ec_name').value = name;
+    openModal('editCatModal');
+}
+
+function editWhyModal(id,title,desc) {
+    document.getElementById('editWhyForm').action = '/admin/why/edit/' + id;
+    document.getElementById('ew_title').value = title;
+    document.getElementById('ew_desc').value = desc;
+    openModal('editWhyModal');
+}
+
+// === TOAST ===
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// Check for flash messages
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('saved')) showToast('Changes saved successfully!');
+</script>
+</body>
+</html>

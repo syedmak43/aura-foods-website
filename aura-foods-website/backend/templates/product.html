@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="breadcrumbs" style="padding:8rem 1.5rem 0;max-width:1280px;margin:0 auto" itemscope itemtype="https://schema.org/BreadcrumbList">
+    <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/" itemprop="item"><span itemprop="name">Home</span></a><meta itemprop="position" content="1"></span>
+    <span>/</span>
+    <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/shop" itemprop="item"><span itemprop="name">Shop</span></a><meta itemprop="position" content="2"></span>
+    <span>/</span>
+    <span class="current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><span itemprop="name">{{ product.name }}</span><meta itemprop="position" content="3"></span>
+</div>
+<div class="product-detail" itemscope itemtype="https://schema.org/Product">
+    <div class="product-gallery fade-up">
+        <img src="{{ product.image }}" alt="{{ product.name }} - {{ product.tagline }}" itemprop="image">
+    </div>
+    <div class="product-detail-info fade-up">
+        <div class="product-name" itemprop="name">{{ product.name }}</div>
+        <div class="product-rating">
+            <div class="stars"><svg viewBox="0 0 24 24" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="var(--gold)"/></svg><svg viewBox="0 0 24 24" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="var(--gold)"/></svg><svg viewBox="0 0 24 24" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="var(--gold)"/></svg><svg viewBox="0 0 24 24" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="var(--gold)"/></svg><svg viewBox="0 0 24 24" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="var(--gold)"/></svg></div>
+            <span>4.8 (124 reviews)</span>
+        </div>
+        <div class="product-detail-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+            <span itemprop="price">Rs.{{ product.price }}</span>
+            <meta itemprop="priceCurrency" content="PKR">
+            <link itemprop="availability" href="https://schema.org/InStock">
+        </div>
+        <p class="product-detail-desc" itemprop="description">{{ product.description }}</p>
+        <div class="product-options">
+            <div class="option-label">Weight</div>
+            <div class="option-buttons">
+                <button class="option-btn active">{{ product.weight }}</button>
+            </div>
+        </div>
+        <div class="qty-selector">
+            <div class="option-label" style="margin-right:1rem">Quantity</div>
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <span class="qty-value" id="qtyInput">1</span>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <div class="product-actions">
+            <button class="btn-primary" onclick="addToCart('{{ product.id }}','{{ product.name | e }}',{{ product.price }},'{{ product.image }}','{{ product.weight }}')">Add to Cart</button>
+            <a href="https://wa.me/923001234567?text=Hi%2C%20I%20want%20to%20order%20{{ product.name | urlencode }}" target="_blank" rel="noopener" class="btn-secondary">Order on WhatsApp</a>
+        </div>
+
+        <div class="product-tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab-group="product" data-tab="desc" onclick="switchTab('product','desc')">Description</button>
+                <button class="tab-btn" data-tab-group="product" data-tab="ingredients" onclick="switchTab('product','ingredients')">Ingredients</button>
+                <button class="tab-btn" data-tab-group="product" data-tab="usage" onclick="switchTab('product','usage')">Usage</button>
+            </div>
+            <div class="tab-content active" data-tab-group="product" data-tab="desc">{{ product.description }}</div>
+            <div class="tab-content" data-tab-group="product" data-tab="ingredients">{{ product.ingredients }}</div>
+            <div class="tab-content" data-tab-group="product" data-tab="usage">{{ product.usage }}</div>
+        </div>
+    </div>
+</div>
+
+{% if related %}
+<section class="section">
+    <div class="section-header">
+        <div class="section-eyebrow">You May Also Like</div>
+        <h2 class="section-title">Related Products</h2>
+    </div>
+    <div class="grid-4">
+        {% for p in related %}
+        <div class="product-card">
+            <a href="/product/{{ p.id }}" class="card-link">
+                <img src="{{ p.image }}" alt="{{ p.name }}" class="card-img" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/product/{{ p.id }}" class="card-link">
+                    <div class="product-name">{{ p.name }}</div>
+                    <div class="product-price-row">
+                        <span class="product-price">Rs.{{ p.price }}</span>
+                        <span class="product-weight">{{ p.weight }}</span>
+                    </div>
+                </a>
+                <button class="btn-add-cart" onclick="addToCart('{{ p.id }}','{{ p.name | e }}',{{ p.price }},'{{ p.image }}','{{ p.weight }}')">Add to Cart</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

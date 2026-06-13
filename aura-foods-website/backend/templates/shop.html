@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="shop-header" itemscope itemtype="https://schema.org/CollectionPage">
+    <h1 itemprop="name">Our Spice Collection</h1>
+    <p itemprop="description">Every spice tells a story of Pakistani heritage. Hand-sourced, stone-ground, and packed with pride.</p>
+</section>
+<div class="shop-layout">
+    <aside class="shop-sidebar fade-up" itemscope itemtype="https://schema.org/SiteNavigationElement">
+        <h3>Categories</h3>
+        <nav class="shop-categories">
+            <a href="/shop" class="{% if not active_category %}active{% endif %}" itemprop="url">All Products</a>
+            {% for c in categories %}
+            <a href="/shop?category={{ c.name.lower().replace(' ', '-') }}" class="{% if active_category and active_category == c.name.lower().replace(' ', '-') %}active{% endif %}" itemprop="url">{{ c.name }}</a>
+            {% endfor %}
+        </nav>
+    </aside>
+    <div>
+        <div class="shop-grid">
+            {% for p in products %}
+            <div class="product-card fade-up" itemscope itemtype="https://schema.org/Product">
+                <a href="/product/{{ p.id }}" class="card-link">
+                    {% if p.bestSeller %}<span class="card-badge card-badge-seller">Best Seller</span>{% endif %}
+                    {% if p.newArrival %}<span class="card-badge card-badge-new">New</span>{% endif %}
+                    <img src="{{ p.image }}" alt="{{ p.name }}" class="card-img" loading="lazy" itemprop="image">
+                </a>
+                <div class="product-info">
+                    <a href="/product/{{ p.id }}" class="card-link">
+                        <div class="product-name" itemprop="name">{{ p.name }}</div>
+                        <div class="product-tagline" itemprop="description">{{ p.tagline }}</div>
+                        <div class="product-price-row">
+                            <span class="product-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer"><span itemprop="price">{{ p.price }}</span><meta itemprop="priceCurrency" content="PKR"></span>
+                            <span class="product-weight">{{ p.weight }}</span>
+                        </div>
+                    </a>
+                    <button class="btn-add-cart" onclick="addToCart('{{ p.id }}','{{ p.name | e }}',{{ p.price }},'{{ p.image }}','{{ p.weight }}')">Add to Cart</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

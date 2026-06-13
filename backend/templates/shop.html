@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="shop-header" itemscope itemtype="https://schema.org/CollectionPage">
+    <h1 itemprop="name">Our Spice Collection</h1>
+    <p itemprop="description">Every spice tells a story of Pakistani heritage. Hand-sourced, stone-ground, and packed with pride.</p>
+</section>
+<div class="shop-layout">
+    <aside class="shop-sidebar fade-up" itemscope itemtype="https://schema.org/SiteNavigationElement">
+        <h3>Categories</h3>
+        <nav class="shop-categories">
+            <a href="/shop" class="{% if not active_category %}active{% endif %}" itemprop="url">All Products</a>
+            {% for c in categories %}
+            <a href="/shop?category={{ c.slug }}" class="{% if active_category and active_category == c.slug %}active{% endif %}" itemprop="url">{{ c.name }}</a>
+            {% endfor %}
+        </nav>
+    </aside>
+    <div>
+        <div class="shop-grid">
+            {% for p in products %}
+            <div class="product-card fade-up" itemscope itemtype="https://schema.org/Product">
+                <a href="/product/{{ p.id }}" class="card-link">
+                    {% if p.bestSeller %}<span class="card-badge card-badge-seller">Best Seller</span>{% endif %}
+                    {% if p.newArrival %}<span class="card-badge card-badge-new">New</span>{% endif %}
+                    <img src="{{ p.image }}" alt="{{ p.name }}" class="card-img" loading="lazy" itemprop="image">
+                </a>
+                <div class="product-info">
+                    <a href="/product/{{ p.id }}" class="card-link">
+                        <div class="product-name" itemprop="name">{{ p.name }}</div>
+                        <div class="product-tagline" itemprop="description">{{ p.tagline }}</div>
+                        <div class="product-price-row">
+                            <span class="product-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer"><span itemprop="price">{{ p.price }}</span><meta itemprop="priceCurrency" content="PKR"></span>
+                            <span class="product-weight">{{ p.weight }}</span>
+                        </div>
+                    </a>
+                    {% if p.grammage_options %}
+                    <div class="gram-options">
+                        {% for g, gp in p.grammage_options.items %}
+                        <button class="gram-btn{% if forloop.first %} active{% endif %}" data-pid="{{ p.id }}" data-weight="{{ g }}g" data-price="{{ gp }}" onclick="selectGramCard(this)">{{ g }}g</button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <button class="btn-add-cart" onclick="addToCart('{{ p.id }}','{{ p.name }}',{% if p.grammage_options %}{% for g,gp in p.grammage_options.items %}{% if forloop.first %}{{ gp }}{% endif %}{% endfor %}{% else %}{{ p.price }}{% endif %},'{{ p.image }}','{% if p.grammage_options %}{% for g,gp in p.grammage_options.items %}{% if forloop.first %}{{ g }}g{% endif %}{% endfor %}{% else %}{{ p.weight }}{% endif %}')">Add to Cart</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

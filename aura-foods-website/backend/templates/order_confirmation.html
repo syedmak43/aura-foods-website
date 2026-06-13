@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="order-confirm fade-up">
+    <div class="checkmark">✓</div>
+    <h1>Order Confirmed!</h1>
+    <p>Thank you for choosing Aura Foods. Your order has been placed successfully and we'll start preparing it right away.</p>
+    <p style="font-size:.875rem;color:var(--muted);margin-top:1rem">You'll receive a confirmation call on your provided number within 30 minutes.</p>
+    <div style="margin-top:2.5rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="/shop" class="btn-primary">Continue Shopping</a>
+        <a href="/" class="btn-secondary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}
