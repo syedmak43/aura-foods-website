@@ -1,8 +1,18 @@
 {
-  "builds": [
-    {
-      "src": "Dockerfile",
-      "use": "@vercel/docker"
+  "version": 2,
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.12"
     }
-  ]
+  },
+  "routes": [
+    {
+      "src": "(.*)",
+      "dest": "/api/index.py"
+    }
+  ],
+  "env": {
+      "AURAFOODS_DATA_ROOT": "/tmp/data",
+      "AURAFOODS_MEDIA_ROOT": "/tmp/uploads"
+  }
 }
